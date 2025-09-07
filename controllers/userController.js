@@ -83,6 +83,23 @@ const getUserByEmail = (req,res) => {
   }
 }
 
+const getUserById = (req,res) => {
+    const {id} = req.params;
+    console.log("id:",id)
+    try {
+    const users = User.getByUserId(id); // synchronous method on your user model to get all users
+    return res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to retrieve user",
+    });
+  }
+}
+
 const updateUser = (req, res) => {
   const { id } = req.params;
   const data = req.body;
@@ -127,4 +144,4 @@ const deleteUser = (req, res) => {
   }
 };
 
-module.exports = { userRegistration, loginUser,getAllUsers,getUserByEmail,deleteUser,updateUser };
+module.exports = { userRegistration, loginUser,getAllUsers,getUserByEmail,deleteUser,updateUser,getUserById };

@@ -26,6 +26,15 @@ const User = {
       throw err;
     }
   },
+  getByUserId: (id) => {
+    try {
+      const stmt = db.prepare("SELECT * FROM user WHERE id = ?");
+      const user = stmt.get(id); // returns user object or undefined
+      return user;
+    } catch (err) {
+      throw err;
+    }
+  },
 
   getAll: () => {
     const stmt = db.prepare("SELECT * FROM user");
