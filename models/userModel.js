@@ -2,13 +2,15 @@ const bcrypt = require("bcryptjs");
 const db = require("../db");
 
 const User = {
-  create: (email, password) => {
+  create: (name, email, password) => {
     // bcrypt.hashSync is synchronous (use hash if you need async, but better-sqlite3 is synchronous)
     const hashedPassword = bcrypt.hashSync(password, 10);
-
+    // console.log("hashedPassword:",hashedPassword)
     try {
-      const stmt = db.prepare("INSERT INTO user (email, password) VALUES (?, ?)");
-      const result = stmt.run(email, hashedPassword);
+      const stmt = db.prepare("INSERT INTO user (name, email, password) VALUES (?, ?,?)");
+      // console.log("stmt:",stmt)
+      const result = stmt.run(name,email, hashedPassword);
+      // console.log("result:",result)
       return { id: result.lastInsertRowid };
     } catch (err) {
       throw err;
@@ -28,6 +30,22 @@ const User = {
   getAll: () => {
     const stmt = db.prepare("SELECT * FROM user");
     return stmt.all(); // returns all users as an array
+  },
+
+  updateById: (id, data) => {
+    const { email,password } = data;
+    const stmt = db.prepare(`
+      UPDATE user 
+      SET email = ?, password = ?
+      WHERE id = ?
+    `);
+    const result = stmt.run(email, password, id);
+    if (result.changes > 0) {
+      const stmt = db.prepare("SELECT * FROM user WHERE id = ?");
+      const user = stmt.get(id); // returns user object or undefined
+      return user;
+    }
+    return null;
   },
 
   deleteById: (id) => {

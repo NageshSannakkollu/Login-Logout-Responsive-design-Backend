@@ -4,11 +4,11 @@ const User = require("../models/userModel"); // now using better-sqlite3 sync AP
 
 // Registration endpoint
 const userRegistration = async (req, res) => {
-  const { email, password } = req.body;
-
+  const { name,email, password } = req.body;
+  // console.log(req.body)
   try {
     // Will throw if duplicate email, etc.
-    const newUser = User.create(email, password);
+    const newUser = User.create(name, email, password);
     return res.status(201).json({
       message: "New User Created Successfully!",
       user: newUser,
@@ -26,11 +26,10 @@ const userRegistration = async (req, res) => {
 // Login endpoint
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = User.getByEmail(email);
     if (!user) {
-      return res.status(200).json({ message: "Invalid Email..", success: false });
+      return res.status(200).json({ message: "Invalid Email Address!", success: false });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -84,6 +83,35 @@ const getUserByEmail = (req,res) => {
   }
 }
 
+const updateUser = (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+
+  try {
+    const updatedUser = User.updateById(id, data); // <-- custom model method
+
+    if (updatedUser) {
+      return res.status(200).json({
+        success: true,
+        message: "User updated successfully",
+        user: updatedUser,
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update user",
+      error: err.message,
+    });
+  }
+
+};
+
 const deleteUser = (req, res) => {
   const { id } = req.params;
 //   res.send({"ID":id})
@@ -99,4 +127,4 @@ const deleteUser = (req, res) => {
   }
 };
 
-module.exports = { userRegistration, loginUser,getAllUsers,getUserByEmail,deleteUser };
+module.exports = { userRegistration, loginUser,getAllUsers,getUserByEmail,deleteUser,updateUser };
