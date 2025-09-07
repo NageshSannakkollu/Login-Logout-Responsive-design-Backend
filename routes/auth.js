@@ -1,6 +1,5 @@
 const express = require('express');
 const { userRegistration, loginUser, getAllUsers, getUserByEmail, deleteUser,updateUser, getUserById } = require("../controllers/userController");
-
 const router = express.Router();
 
 router.post("/api/auth/signup", userRegistration);
